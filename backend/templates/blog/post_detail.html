@@ -1,11 +1,35 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load humanize %}
-{% block title %}{{ post.title }} · BlogCraftAI{% endblock %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}{{ post.title }} - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:post.summary|truncatechars:160 }}{% endblock %}
+{% block extra_head %}
+    {{ block.super }}
+    <meta property="article:section" content="Blog" />
+    {% if post.published_at %}<meta property="article:published_time" content="{{ post.published_at|date:"c" }}" />{% endif %}
+    <meta property="article:modified_time" content="{{ post.updated_at|date:"c" }}" />
+    {% if post.tags.all %}
+        {% for tag in post.tags.all %}
+            <meta property="article:tag" content="{{ tag.name }}" />
+        {% endfor %}
+    {% endif %}
+{% endblock %}
 {% block content %}
+<nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol>
+        <li><a href="{% url 'blog:post-list' %}">Home</a></li>
+        {% if primary_tag %}
+            <li><a href="{% url 'blog:post-list' %}?tag={{ primary_tag.slug }}">{{ primary_tag.name }}</a></li>
+        {% else %}
+            <li><a href="{% url 'blog:post-list' %}">Posts</a></li>
+        {% endif %}
+        <li aria-current="page">{{ post.title }}</li>
+    </ol>
+</nav>
+
 <article class="card">
     <header>
         <h1>{{ post.title }}</h1>
-        <p class="meta">By {{ post.author.safe_display_name }} · {{ post.published_at|date:"F j, Y" }}</p>
+        <p class="meta">By {{ post.author.safe_display_name }} - {{ post.published_at|date:"F j, Y" }}</p>
         <ul class="tag-list">
             {% for tag in post.tags.all %}
                 <li><span class="tag">{{ tag.name }}</span></li>
@@ -18,7 +42,7 @@
         <h2>Summary</h2>
         <p>{{ post.summary }}</p>
         <h2>Body</h2>
-        <p>{{ post.content|linebreaks }}</p>
+        <div class="rich-text">{{ post.content|linebreaks }}</div>
     </section>
     {% if user == post.author or user.is_staff %}
         <div class="actions">
@@ -83,3 +107,4 @@
     {% endif %}
 </section>
 {% endblock %}
+

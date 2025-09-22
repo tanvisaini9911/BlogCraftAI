@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load humanize %}
-{% block title %}Dashboard · BlogCraftAI{% endblock %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}Dashboard - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Track drafts, monitor publication progress, and stay aligned with your editorial goals." }}{% endblock %}
 {% block content %}
 <section class="card">
     <h1>Your editorial dashboard</h1>
@@ -19,17 +20,16 @@
             <span>Archived</span>
         </div>
     </div>
-    <a class="button" href="{% url 'blog:post-create' %}">Write a new post</a>
 </section>
 
-<section class="card">
-    <h2>Recent updates</h2>
-    <ul class="post-list">
+<section class="card" aria-labelledby="recent-posts">
+    <h2 id="recent-posts">Recently updated</h2>
+    <ul class="dashboard-list">
         {% for post in posts %}
             <li>
                 <article>
                     <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
-                    <p class="meta">Status: {{ post.get_status_display }} · Updated {{ post.updated_at|naturaltime }}</p>
+                    <p class="meta">Status: {{ post.get_status_display }} - Updated {{ post.updated_at|naturaltime }}</p>
                     <div class="actions">
                         <a class="button secondary" href="{% url 'blog:post-update' slug=post.slug %}">Edit</a>
                         <a class="button secondary" href="{% url 'blog:post-delete' slug=post.slug %}">Delete</a>
@@ -37,7 +37,7 @@
                 </article>
             </li>
         {% empty %}
-            <li>You have not written any posts yet. Start by creating your first article.</li>
+            <li>You have no posts yet. Start by <a href="{% url 'blog:post-create' %}">creating your first article</a>.</li>
         {% endfor %}
     </ul>
 </section>

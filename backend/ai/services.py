@@ -59,18 +59,23 @@ class AiSuggestionService:
         self._client = client or httpx.Client(timeout=self.timeout)
 
     def build_payload(self, *, title: str, summary: str, content: str) -> dict:
-        if not title or not summary or not content:
+        title_value = str(title or "").strip()
+        summary_value = str(summary or "").strip()
+        content_value = str(content or "").strip()
+        if not title_value or not summary_value or not content_value:
             raise AiSuggestionError("Title, summary, and content are required for suggestions.")
+
         prompt = (
             "You are an SEO assistant. Provide actionable suggestions for blog optimisation "
             "including improved headings, meta descriptions, and keywords."
         )
+
         return {
             "prompt": prompt,
             "context": {
-                "title": title,
-                "summary": summary,
-                "content": content,
+                "title": title_value,
+                "summary": summary_value,
+                "content": content_value,
             },
             "response_format": {
                 "type": "object",
@@ -82,20 +87,22 @@ class AiSuggestionService:
                             "properties": {
                                 "heading": {"type": "string"},
                                 "description": {"type": "string"},
-                            "keywords": {
-                                "type": "array",
-                                "items": {"type": "string"},
+                                "keywords": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                },
+                                "risks": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                },
                             },
-                            "risks": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                            },
+                            "required": ["heading", "description", "keywords"],
+                            "additionalProperties": False,
                         },
-                        "required": ["heading", "description", "keywords"],
                     },
-                }
-            },
+                },
                 "required": ["suggestions"],
+                "additionalProperties": False,
             },
         }
 
@@ -136,3 +143,5 @@ class AiSuggestionService:
             self._client.close()
         except Exception:  # pragma: no cover
             logger.debug("Failed to close AI client", exc_info=True)
+
+

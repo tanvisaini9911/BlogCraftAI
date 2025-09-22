@@ -1,79 +1,55 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load static %}
-{% block title %}Latest Posts · BlogCraftAI{% endblock %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}Latest Posts - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Discover the latest AI-assisted blogging tutorials, strategy guides, and news from BlogCraftAI." }}{% endblock %}
 {% block content %}
 <section class="hero">
     <div class="card">
-        <h2>Discover AI-assisted writing</h2>
-        <p>Browse posts crafted with BlogCraftAI’s prompt-engineering workflows. Use the search tools to find ideas or filter by tags.</p>
-        {% if user.is_authenticated %}
-            <a class="button" href="{% url 'blog:post-create' %}">Create a new post</a>
-        {% else %}
-            <div class="cta-buttons">
-                <a class="button" href="{% url 'accounts:signup' %}">Get started</a>
-                <a class="button secondary" href="{% url 'accounts:login' %}">Sign in</a>
-            </div>
-        {% endif %}
+        <h1>Latest posts</h1>
+        <p>Stay ahead with AI-assisted storytelling, editorial best practices, and growth experiments.</p>
+        <form class="search-form" role="search">
+            <label for="search" class="visually-hidden">Search articles</label>
+            <input id="search" name="q" placeholder="Search posts" value="{{ search_term }}" />
+            <button class="button" type="submit">Search</button>
+        </form>
     </div>
 </section>
 
 <section class="filters" aria-label="Post filters">
-    <form method="get" class="filter-form">
-        <div class="form-row">
-            <label for="id_search">Search posts</label>
-            <input id="id_search" type="search" name="q" value="{{ search_term }}" placeholder="Search by title or keyword" />
-        </div>
-        <div class="form-row">
-            <label for="id_tag">Filter by tag</label>
-            <select id="id_tag" name="tag">
-                <option value="">All tags</option>
-                {% for tag in tags %}
-                    <option value="{{ tag.slug }}" {% if tag.slug == active_tag %}selected{% endif %}>{{ tag.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button class="button" type="submit">Apply filters</button>
-    </form>
+    <ul class="tag-cloud">
+        <li><a href="{% url 'blog:post-list' %}" class="{% if not active_tag %}active{% endif %}">All</a></li>
+        {% for tag in tags %}
+            <li><a href="?tag={{ tag.slug }}" class="{% if active_tag == tag.slug %}active{% endif %}">{{ tag.name }}</a></li>
+        {% endfor %}
+    </ul>
 </section>
 
-<section aria-live="polite" class="post-grid">
-    {% if posts %}
-        <div class="card-grid">
-            {% for post in posts %}
-                <article class="card" aria-labelledby="post-{{ post.slug }}">
-                    <header>
-                        <h2 id="post-{{ post.slug }}"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
-                        <p class="meta">By {{ post.author.safe_display_name }} · {{ post.published_at|date:"F j, Y" }}</p>
-                    </header>
-                    <p>{{ post.summary|truncatewords:40 }}</p>
-                    <footer>
-                        <ul class="tag-list">
-                            {% for tag in post.tags.all %}
-                                <li><span class="tag">{{ tag.name }}</span></li>
-                            {% empty %}
-                                <li><span class="tag">General</span></li>
-                            {% endfor %}
-                        </ul>
-                    </footer>
-                </article>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No posts found. Try adjusting your filters or check back soon.</p>
-    {% endif %}
+<section class="grid" aria-label="Post listings">
+    {% for post in posts %}
+        <article class="card" aria-labelledby="post-{{ post.slug }}">
+            <header>
+                <h2 id="post-{{ post.slug }}"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
+                <p class="meta">By {{ post.author.safe_display_name }} - {{ post.published_at|date:"F j, Y" }}</p>
+            </header>
+            <p>{{ post.summary|truncatewords:40 }}</p>
+            <footer>
+                <a class="button secondary" href="{{ post.get_absolute_url }}" aria-label="Read {{ post.title }}">Read more</a>
+            </footer>
+        </article>
+    {% empty %}
+        <p>No posts yet. Check back soon for fresh content.</p>
+    {% endfor %}
 </section>
 
 {% if is_paginated %}
-<nav aria-label="Pagination" class="pagination">
-    <ul>
+    <nav class="pagination" aria-label="Pagination">
         {% if page_obj.has_previous %}
-            <li><a href="?q={{ search_term }}&tag={{ active_tag }}&page={{ page_obj.previous_page_number }}">Previous</a></li>
+            <a class="button secondary" href="?page={{ page_obj.previous_page_number }}{% if search_term %}&amp;q={{ search_term }}{% endif %}{% if active_tag %}&amp;tag={{ active_tag }}{% endif %}">Previous</a>
         {% endif %}
-        <li>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</li>
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-            <li><a href="?q={{ search_term }}&tag={{ active_tag }}&page={{ page_obj.next_page_number }}">Next</a></li>
+            <a class="button secondary" href="?page={{ page_obj.next_page_number }}{% if search_term %}&amp;q={{ search_term }}{% endif %}{% if active_tag %}&amp;tag={{ active_tag }}{% endif %}">Next</a>
         {% endif %}
-    </ul>
-</nav>
+    </nav>
 {% endif %}
 {% endblock %}

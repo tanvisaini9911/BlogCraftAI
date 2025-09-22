@@ -1,5 +1,6 @@
-{% extends "base.html" %}
-{% block title %}{% if form.instance.pk %}Edit {{ form.instance.title }}{% else %}Create post{% endif %} · BlogCraftAI{% endblock %}
+﻿{% extends "base.html" %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}{% if form.instance.pk %}Edit {{ form.instance.title }}{% else %}Create post{% endif %} - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Draft, optimise, and publish AI-assisted stories from a focused writing workspace." }}{% endblock %}
 {% block content %}
 <section class="card">
     <h1>{% if form.instance.pk %}Edit post{% else %}Create a new post{% endif %}</h1>
@@ -18,7 +19,6 @@
             </div>
         {% endfor %}
         <button class="button" type="submit">Save post</button>
-        <a class="button secondary" href="{% url 'blog:dashboard' %}">Cancel</a>
     </form>
 </section>
 {% endblock %}

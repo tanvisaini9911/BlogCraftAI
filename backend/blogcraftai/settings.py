@@ -7,8 +7,19 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SITE_NAME = os.getenv("SITE_NAME", "BlogCraftAI")
+SITE_DOMAIN = os.getenv("SITE_DOMAIN", "127.0.0.1:8000")
+SITE_URL = os.getenv("SITE_URL", f"http://{SITE_DOMAIN}").rstrip('/')
+SITE_DESCRIPTION = os.getenv("SITE_DESCRIPTION", "AI-assisted blogging platform")
+SEO_DEFAULT_IMAGE = os.getenv("SEO_DEFAULT_IMAGE", "")
+
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "insecure-development-key")
-DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in {"1", "true", "yes"}
+DJANGO_ENV = os.getenv("DJANGO_ENV", "development").lower()
+debug_flag = os.getenv("DJANGO_DEBUG")
+if debug_flag is not None:
+    DEBUG = debug_flag.lower() in {"1", "true", "yes"}
+else:
+    DEBUG = DJANGO_ENV not in {"production", "prod"}
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -30,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "django.contrib.sitemaps",
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
@@ -62,6 +74,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "blogcraftai.context_processors.seo_defaults",
             ],
         },
     }
@@ -173,3 +186,4 @@ LOGGING = {
 
 AI_PROVIDER_URL = os.getenv("AI_PROVIDER_URL", "https://example.com/v1/seo")
 AI_PROVIDER_TIMEOUT = float(os.getenv("AI_PROVIDER_TIMEOUT", "10"))
+

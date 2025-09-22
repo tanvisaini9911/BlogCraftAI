@@ -1,5 +1,6 @@
-{% extends "base.html" %}
-{% block title %}Delete {{ object.title }} · BlogCraftAI{% endblock %}
+﻿{% extends "base.html" %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}Delete {{ object.title }} - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Confirm deletion of a post and clean up your editorial backlog." }}{% endblock %}
 {% block content %}
 <section class="card">
     <h1>Delete post</h1>
