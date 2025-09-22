@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Your profile · BlogCraftAI{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>Profile</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <label for="id_display_name">Display name</label>
+            <input id="id_display_name" name="display_name" type="text" value="{{ request.user.display_name }}" />
+        </div>
+        <div class="form-row">
+            <label for="id_avatar">Avatar URL</label>
+            <input id="id_avatar" name="avatar_url" type="url" value="{{ request.user.avatar_url }}" />
+        </div>
+        <div class="form-row">
+            <label for="id_bio">Bio</label>
+            <textarea id="id_bio" name="bio" rows="4">{{ request.user.bio }}</textarea>
+        </div>
+        <button class="button" type="submit">Save changes</button>
+    </form>
+</section>
+{% endblock %}

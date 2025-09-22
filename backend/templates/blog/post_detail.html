@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{{ post.title }} · BlogCraftAI{% endblock %}
+{% block content %}
+<article class="card">
+    <header>
+        <h1>{{ post.title }}</h1>
+        <p class="meta">By {{ post.author.safe_display_name }} · {{ post.published_at|date:"F j, Y" }}</p>
+        <ul class="tag-list">
+            {% for tag in post.tags.all %}
+                <li><span class="tag">{{ tag.name }}</span></li>
+            {% empty %}
+                <li><span class="tag">General</span></li>
+            {% endfor %}
+        </ul>
+    </header>
+    <section class="post-content">
+        <h2>Summary</h2>
+        <p>{{ post.summary }}</p>
+        <h2>Body</h2>
+        <p>{{ post.content|linebreaks }}</p>
+    </section>
+    {% if user == post.author or user.is_staff %}
+        <div class="actions">
+            <a class="button" href="{% url 'blog:post-update' slug=post.slug %}">Edit</a>
+            <a class="button secondary" href="{% url 'blog:post-delete' slug=post.slug %}">Delete</a>
+        </div>
+    {% endif %}
+</article>
+
+<section class="card" aria-labelledby="seo-insights">
+    <h2 id="seo-insights">AI SEO suggestions</h2>
+    {% if ai_error %}
+        <p class="message message-error">{{ ai_error }}</p>
+    {% endif %}
+    {% if seo_suggestions %}
+        <ol>
+            {% for suggestion in seo_suggestions %}
+                <li>
+                    <h3>{{ suggestion.heading }}</h3>
+                    <p>{{ suggestion.description }}</p>
+                    <p><strong>Keywords:</strong> {{ suggestion.keywords|join:", " }}</p>
+                    {% if suggestion.risks %}
+                        <p><strong>Risks:</strong> {{ suggestion.risks|join:", " }}</p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p>Suggestions will appear here once AI processing succeeds.</p>
+    {% endif %}
+</section>
+
+<section class="card" aria-labelledby="comments">
+    <h2 id="comments">Comments</h2>
+    <ul class="comment-list">
+        {% for comment in comments %}
+            <li>
+                <header>
+                    <strong>{{ comment.author.safe_display_name }}</strong>
+                    <span class="meta">{{ comment.created_at|naturaltime }}</span>
+                </header>
+                <p>{{ comment.body|linebreaks }}</p>
+            </li>
+        {% empty %}
+            <li>No comments yet. Be the first to join the discussion.</li>
+        {% endfor %}
+    </ul>
+    {% if user.is_authenticated %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                {{ comment_form.body.label_tag }}
+                {{ comment_form.body }}
+                {% if comment_form.body.errors %}
+                    <p class="message message-error">{{ comment_form.body.errors|join:", " }}</p>
+                {% endif %}
+            </div>
+            <button class="button" type="submit">Post comment</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'accounts:login' %}">Sign in</a> to add a comment.</p>
+    {% endif %}
+</section>
+{% endblock %}

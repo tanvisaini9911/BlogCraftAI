@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}BlogCraftAI{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <meta name="description" content="{% block meta_description %}AI-assisted blogging platform{% endblock %}" />
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+        <div class="container">
+            <h1 class="site-title"><a href="{% url 'blog:post-list' %}">BlogCraftAI</a></h1>
+            <nav aria-label="Primary navigation">
+                <ul class="nav-list">
+                    <li><a href="{% url 'blog:post-list' %}">Home</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'blog:dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'accounts:profile-page' %}">Profile</a></li>
+                        <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{% url 'accounts:login' %}">Login</a></li>
+                        <li><a href="{% url 'accounts:signup' %}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" class="container">
+        {% if messages %}
+            <div class="messages" role="status" aria-live="polite">
+                {% for message in messages %}
+                    <div class="message message-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; {% now 'Y' %} BlogCraftAI. Built for education and experimentation.</p>
+        </div>
+    </footer>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

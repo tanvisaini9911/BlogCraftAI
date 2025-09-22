@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Latest Posts · BlogCraftAI{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="card">
+        <h2>Discover AI-assisted writing</h2>
+        <p>Browse posts crafted with BlogCraftAI’s prompt-engineering workflows. Use the search tools to find ideas or filter by tags.</p>
+        {% if user.is_authenticated %}
+            <a class="button" href="{% url 'blog:post-create' %}">Create a new post</a>
+        {% else %}
+            <div class="cta-buttons">
+                <a class="button" href="{% url 'accounts:signup' %}">Get started</a>
+                <a class="button secondary" href="{% url 'accounts:login' %}">Sign in</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="filters" aria-label="Post filters">
+    <form method="get" class="filter-form">
+        <div class="form-row">
+            <label for="id_search">Search posts</label>
+            <input id="id_search" type="search" name="q" value="{{ search_term }}" placeholder="Search by title or keyword" />
+        </div>
+        <div class="form-row">
+            <label for="id_tag">Filter by tag</label>
+            <select id="id_tag" name="tag">
+                <option value="">All tags</option>
+                {% for tag in tags %}
+                    <option value="{{ tag.slug }}" {% if tag.slug == active_tag %}selected{% endif %}>{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button class="button" type="submit">Apply filters</button>
+    </form>
+</section>
+
+<section aria-live="polite" class="post-grid">
+    {% if posts %}
+        <div class="card-grid">
+            {% for post in posts %}
+                <article class="card" aria-labelledby="post-{{ post.slug }}">
+                    <header>
+                        <h2 id="post-{{ post.slug }}"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
+                        <p class="meta">By {{ post.author.safe_display_name }} · {{ post.published_at|date:"F j, Y" }}</p>
+                    </header>
+                    <p>{{ post.summary|truncatewords:40 }}</p>
+                    <footer>
+                        <ul class="tag-list">
+                            {% for tag in post.tags.all %}
+                                <li><span class="tag">{{ tag.name }}</span></li>
+                            {% empty %}
+                                <li><span class="tag">General</span></li>
+                            {% endfor %}
+                        </ul>
+                    </footer>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No posts found. Try adjusting your filters or check back soon.</p>
+    {% endif %}
+</section>
+
+{% if is_paginated %}
+<nav aria-label="Pagination" class="pagination">
+    <ul>
+        {% if page_obj.has_previous %}
+            <li><a href="?q={{ search_term }}&tag={{ active_tag }}&page={{ page_obj.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        <li>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</li>
+        {% if page_obj.has_next %}
+            <li><a href="?q={{ search_term }}&tag={{ active_tag }}&page={{ page_obj.next_page_number }}">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

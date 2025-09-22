@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Sign in · BlogCraftAI{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>Sign in</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-row">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.errors %}<p class="message message-error">{{ form.username.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div class="form-row">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            {% if form.password.errors %}<p class="message message-error">{{ form.password.errors|join:", " }}</p>{% endif %}
+        </div>
+        <button class="button" type="submit">Sign in</button>
+    </form>
+    <p>Need an account? <a href="{% url 'accounts:signup' %}">Register</a>.</p>
+</section>
+{% endblock %}

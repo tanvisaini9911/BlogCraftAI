@@ -1,0 +1,1 @@
+"""BlogCraftAI Django project."""
