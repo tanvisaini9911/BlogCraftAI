@@ -71,4 +71,3 @@ BlogCraftAI is a structured training program that guides learners from non-techn
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
