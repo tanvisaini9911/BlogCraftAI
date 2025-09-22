@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Signed out · BlogCraftAI{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>See you soon!</h1>
+    <p>You have been signed out successfully.</p>
+    <a class="button" href="{% url 'accounts:login' %}">Sign in again</a>
+</section>
+{% endblock %}

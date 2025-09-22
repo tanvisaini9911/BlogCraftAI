@@ -1,0 +1,102 @@
+{
+  "name": "BlogCraftAI Scheduled Publisher",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": 1,
+          "unit": "days"
+        }
+      },
+      "id": "1",
+      "name": "Daily Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "https://blogcraftai.local/api/posts/?status=draft",
+        "options": {
+          "batching": {
+            "batchMode": "pagination"
+          }
+        }
+      },
+      "id": "2",
+      "name": "Fetch Draft Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "functionCode": "const ready = items.filter(item => item.json.meta.readiness_score >= 0.8);\nreturn ready;"
+      },
+      "id": "3",
+      "name": "Filter Ready Posts",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{$json[\"links\"][\"publish\"]}}",
+        "options": {
+          "ignoreResponse": true
+        }
+      },
+      "id": "4",
+      "name": "Publish Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "channel": "#content-ops",
+        "text": "={{`Published ${$json.title} via BlogCraftAI automation`}}"
+      },
+      "id": "5",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Daily Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Draft Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Draft Posts": {
+      "main": [
+        [
+          {
+            "node": "Filter Ready Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Ready Posts": {
+      "main": [
+        [
+          {
+            "node": "Publish Post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

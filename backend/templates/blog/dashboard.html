@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Dashboard · BlogCraftAI{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>Your editorial dashboard</h1>
+    <p>Monitor drafts, publish new stories, and keep an eye on performance indicators.</p>
+    <div class="stats-grid">
+        <div class="stat">
+            <strong>{{ draft_count }}</strong>
+            <span>Drafts</span>
+        </div>
+        <div class="stat">
+            <strong>{{ published_count }}</strong>
+            <span>Published</span>
+        </div>
+        <div class="stat">
+            <strong>{{ archived_count }}</strong>
+            <span>Archived</span>
+        </div>
+    </div>
+    <a class="button" href="{% url 'blog:post-create' %}">Write a new post</a>
+</section>
+
+<section class="card">
+    <h2>Recent updates</h2>
+    <ul class="post-list">
+        {% for post in posts %}
+            <li>
+                <article>
+                    <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+                    <p class="meta">Status: {{ post.get_status_display }} · Updated {{ post.updated_at|naturaltime }}</p>
+                    <div class="actions">
+                        <a class="button secondary" href="{% url 'blog:post-update' slug=post.slug %}">Edit</a>
+                        <a class="button secondary" href="{% url 'blog:post-delete' slug=post.slug %}">Delete</a>
+                    </div>
+                </article>
+            </li>
+        {% empty %}
+            <li>You have not written any posts yet. Start by creating your first article.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

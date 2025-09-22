@@ -1,73 +1,89 @@
-# BlogCraftAI Learning Paths
+# BlogCraftAI
 
-BlogCraftAI is a structured training program that guides learners from non-technical onboarding to delivering a production-ready AI-assisted blogging platform. The repository now hosts full curricula, resources, and quality gates for every planned branch, enabling teams to execute specialization tracks sequentially or in parallel.
+BlogCraftAI is a teaching-ready reference implementation that mirrors the 30-hour training program outlined in the curriculum. It provides a production-grade Django stack with AI integrations, responsive templates, automation samples, and exhaustive tests so that learners can explore every branch with confidence.
 
-## Repository Structure
+## Table of Contents
+- [Feature Overview](#feature-overview)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+- [Use Case Outcomes](#use-case-outcomes)
+- [Key API Endpoints](#key-api-endpoints)
+- [AI Prompt Engineering Toolkit](#ai-prompt-engineering-toolkit)
+- [Automation Blueprints](#automation-blueprints)
+- [Testing Strategy](#testing-strategy)
 
-- `curriculum/non_technical_starter.md` – 30-hour facilitator-ready agenda for non-technical participants.
-- `resources/` – Shared resource library used across tracks.
-- `roadmap/branch_blueprints.md` – High-level scope documents summarizing each technical branch.
-- `templates/` – Business and planning templates reused by facilitators.
-- `tracks/` – Dedicated documentation packages for each technical branch (Django, Prompt Engineering, Frontend, BlogCraftAI, AI Agents).
-- `tests/` – Testing strategy overview and links to branch-specific quality plans.
-
-## Track Overview
-
-### Main Branch – Non-Technical Starter
-- Focus: Product vision, stakeholder alignment, and content operations fundamentals.
-- Outcome: Participants craft learning plans and understand how each technical branch contributes to the platform.
-- Key Assets: [Agenda](curriculum/non_technical_starter.md), [Resource kits](resources/), facilitator checklists.
-
-### Django Backend Track (`tracks/django`)
-- Focus: Project scaffolding (`accounts`, `blog`, `api`), PostgreSQL integration, JWT auth, CRUD APIs with permissions.
-- Outcome: Production-ready Django services with 90%+ automated test coverage and deployment pipelines.
-- Key Assets: [Curriculum](tracks/django/curriculum.md), [Resources](tracks/django/resources.md), [Assessments](tracks/django/assessments.md), [Templates](tracks/django/templates/).
-
-### Prompt Engineering Track (`tracks/prompt_engineering`)
-- Focus: Prompt design fundamentals, schema validation, guardrails, and `/api/ai/suggest` implementation with Hugging Face models.
-- Outcome: Safe, observable AI suggestion service that handles retries, forbidden terms, and latency SLAs.
-- Key Assets: [Curriculum](tracks/prompt_engineering/curriculum.md), [Resources](tracks/prompt_engineering/resources.md), [Assessments](tracks/prompt_engineering/assessments.md), [Templates](tracks/prompt_engineering/templates/).
-
-### Frontend Experience Track (`tracks/frontend`)
-- Focus: Accessible Django Template frontend with Bootstrap 5 and HTMX, covering authentication, post list/detail, comments, editor with “Suggest SEO”.
-- Outcome: Responsive UI meeting Lighthouse 90+ benchmarks with comprehensive component, accessibility, and e2e tests.
-- Key Assets: [Curriculum](tracks/frontend/curriculum.md), [Resources](tracks/frontend/resources.md), [Assessments](tracks/frontend/assessments.md), [Templates](tracks/frontend/templates/).
-
-### BlogCraftAI Full-Stack Track (`tracks/blogcraftai`)
-- Focus: Integrating backend, frontend, AI, and ops into the full production platform (Django 5, DRF, PostgreSQL, HTMX, Render.com).
-- Outcome: Deployment-ready BlogCraftAI application with SLO monitoring, runbooks, and governance artifacts.
-- Key Assets: [Curriculum](tracks/blogcraftai/curriculum.md), [Resources](tracks/blogcraftai/resources.md), [Assessments](tracks/blogcraftai/assessments.md), [Templates](tracks/blogcraftai/templates/).
-
-### AI Agents Track (`tracks/ai_agents`)
-- Focus: n8n/Make.com automations connecting BlogCraftAI with external systems, including governance and failure simulations.
-- Outcome: Auditable automation workflows with CI/CD, monitoring, and compliance documentation.
-- Key Assets: [Curriculum](tracks/ai_agents/curriculum.md), [Resources](tracks/ai_agents/resources.md), [Assessments](tracks/ai_agents/assessments.md), [Templates](tracks/ai_agents/templates/).
-
-## Required Resources by Track
-
-| Track | Core Tooling |
+## Feature Overview
+| Branch | Highlights |
 | --- | --- |
-| Non-Technical Starter | Collaboration suite (Miro, Docs), sample personas, analytics snapshots |
-| Django | Python 3.11, Django 5, DRF, PostgreSQL, Redis, pytest, GitHub Actions |
-| Prompt Engineering | Hugging Face models, transformers, guardrails, httpx/tenacity, monitoring stack |
-| Frontend | Django Templates, Bootstrap 5, HTMX, Vite, Jest, Playwright, Lighthouse |
-| BlogCraftAI | Full integrated stack + Render.com, Gunicorn, WhiteNoise, OpenTelemetry |
-| AI Agents | n8n/Make.com, Vault, automation testing harness, workflow repositories |
+| Main | Onboarding template, resource checklist, communication guidelines. |
+| Django | Modular project (`accounts`, `blog`, `ai`), PostgreSQL-ready config, JWT auth, audited logging. |
+| Prompt Engineering | `AiSuggestionService` with structured prompts, timeout handling, schema validation, unit tests. |
+| Frontend | Responsive Django templates, accessibility support, SEO insights panel, pagination, dashboards. |
+| BlogCraftAI | Unified architecture diagram, environment configuration, observability hooks, deployment-ready static handling. |
+| AI Agents | n8n and Make.com automation JSON blueprints for editorial workflows. |
+
+## Architecture
+- **Backend:** Django 5 + Django REST Framework powering authentication, blog CRUD, and AI endpoints. Custom user model enforces email logins and profile metadata.
+- **Database:** Ships with SQLite for local development and environment-driven PostgreSQL configuration for staging/production.
+- **Frontend:** Server-rendered templates styled with a responsive utility sheet. Components are WCAG-conscious, keyboard navigable, and optimised for Lighthouse/PageSpeed budgets.
+- **AI Layer:** `AiSuggestionService` encapsulates prompt engineering contracts, input validation, resilience strategies, and JSON parsing into `SeoSuggestion` dataclasses.
+- **Automation:** Reusable workflow definitions demonstrate how to orchestrate BlogCraftAI APIs from n8n and Make.com for scheduling, enrichment, and notifications.
 
 ## Getting Started
+1. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. **Apply migrations**
+   ```bash
+   cd backend
+   python manage.py migrate
+   ```
+3. **Create a superuser (optional but recommended)**
+   ```bash
+   python manage.py createsuperuser
+   ```
+4. **Run the development server**
+   ```bash
+   python manage.py runserver
+   ```
+5. **Access the app** at `http://127.0.0.1:8000/`
 
-1. Choose the track that aligns with your team’s readiness.
-2. Review the corresponding curriculum and resources within `tracks/`.
-3. Prepare environments and tooling outlined in each track’s resource guide.
-4. Follow assessment guides to ensure quality gates are met before graduation.
-5. Update this README with additional outcomes as new cohorts complete the tracks.
+Environment variables such as `POSTGRES_DB`, `AI_PROVIDER_URL`, and JWT lifetimes can be configured via the shell or a `.env` file to align with deployment targets.
 
-## Testing & Quality Expectations
+## Use Case Outcomes
+- ✅ Learners can register, authenticate via JWT, and manage their profile through the `/accounts` endpoints and UI flows.
+- ✅ Editors create, publish, edit, and archive posts with tag management, reaction tracking, and permissioned API access.
+- ✅ Visitors browse, search, and filter posts, while responsive templates guarantee accessible navigation and descriptive SEO metadata.
+- ✅ AI-assisted SEO suggestions surface on post detail pages and through the `/api/seo-suggestions/` endpoint with graceful degradation on provider errors.
+- ✅ Automation teams can plug BlogCraftAI into scheduling systems using the provided n8n and Make.com workflow blueprints.
 
-- Each track includes an `assessments.md` file detailing required automated tests, failure simulations, and acceptance criteria.
-- The [tests directory](tests/README.md) describes how to organize branch-specific test suites once code is implemented.
-- Maintain 90%+ coverage across critical services, enforce linting, and document deviations via ADRs.
+## Key API Endpoints
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| `/accounts/register/` | POST | Create a new user account. |
+| `/accounts/token/` | POST | Obtain JWT access and refresh tokens. |
+| `/accounts/profile/` | GET/PATCH | Retrieve or update the authenticated user profile. |
+| `/api/posts/` | GET/POST | List or create blog posts (supports filtering, search, ordering). |
+| `/api/posts/{slug}/publish/` | POST | Publish a draft post (author/staff only). |
+| `/api/comments/` | POST | Add a public comment to a post. |
+| `/api/reactions/` | POST | Upsert user reactions (like/dislike) on posts. |
+| `/api/seo-suggestions/` | POST | Generate AI SEO suggestions for content drafts. |
 
-## License
+Authenticated requests use Bearer tokens issued by SimpleJWT. Throttling, pagination, and filtering follow DRF conventions to stay predictable for learners.
 
-This project is licensed under the [MIT License](LICENSE).
+## AI Prompt Engineering Toolkit
+- `backend/ai/services.py` encodes the guardrails, schema validation, retry-safe HTTP access, and structured responses required to integrate large language models responsibly.
+- `backend/ai/prompts/seo_optimization.md` documents the canonical prompt, guardrails, and testing checklist used in class to critique prompt design decisions.
+- Comprehensive tests in `backend/tests/test_ai_service.py` simulate success, timeout, and malformed payload scenarios to encourage defensive programming.
+
+## Automation Blueprints
+- `automations/n8n_content_publish.json` schedules daily reviews of draft posts, publishes approved entries, and sends Slack notifications.
+- `automations/make_scenario_blueprint.json` shows how to receive Airtable briefs, seed drafts, request AI suggestions, and push a Teams update—all without writing custom code.
+
+## Testing Strategy
+Run the full suite with:
+```bash
+pytest
+```
+The suite covers API contracts, permission boundaries, AI error handling, and HTML rendering smoke tests. Test fixtures rely on `factory_boy` for expressive setup and include negative as well as failure simulations (timeouts, validation errors).
