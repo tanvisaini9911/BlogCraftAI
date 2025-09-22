@@ -1,6 +1,6 @@
 # Technical Branch Blueprints
 
-This document outlines the learning paths and implementation expectations for each technical branch. Use these blueprints to set up branches once repository policies allow branching.
+This document outlines the learning paths and implementation expectations for each technical branch. Detailed curricula, resources, and assessment artifacts now live in the [`tracks/`](../tracks) directory—consult both the blueprint (strategy) and track package (execution) when initializing branches.
 
 ## Django Branch
 

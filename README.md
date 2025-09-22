@@ -1,53 +1,72 @@
 # BlogCraftAI Learning Paths
 
-BlogCraftAI is a structured training program that guides learners from non-technical onboarding to a production-ready AI-assisted blogging platform. This repository currently hosts the **Non-Technical Starter Track** on the main branch, along with blueprints for technical specialization tracks that will live on dedicated branches.
+BlogCraftAI is a structured training program that guides learners from non-technical onboarding to delivering a production-ready AI-assisted blogging platform. The repository now hosts full curricula, resources, and quality gates for every planned branch, enabling teams to execute specialization tracks sequentially or in parallel.
 
 ## Repository Structure
 
-- `README.md`: High-level documentation, learning outcomes, and roadmap.
-- `curriculum/non_technical_starter.md`: 30-hour facilitator-ready agenda for non-technical participants.
-- `roadmap/branch_blueprints.md`: Scope documents for future technical branches (Django, Prompt Engineering, Frontend, BlogCraftAI, AI Agents).
-- `resources/`: Curated references, checklists, and templates.
-- `tests/README.md`: Explains the testing strategy for this documentation-focused stage.
+- `curriculum/non_technical_starter.md` – 30-hour facilitator-ready agenda for non-technical participants.
+- `resources/` – Shared resource library used across tracks.
+- `roadmap/branch_blueprints.md` – High-level scope documents summarizing each technical branch.
+- `templates/` – Business and planning templates reused by facilitators.
+- `tracks/` – Dedicated documentation packages for each technical branch (Django, Prompt Engineering, Frontend, BlogCraftAI, AI Agents).
+- `tests/` – Testing strategy overview and links to branch-specific quality plans.
 
-## Non-Technical Starter Track Outcomes
+## Track Overview
 
-Participants completing the 30-hour starter track will be able to:
+### Main Branch – Non-Technical Starter
+- Focus: Product vision, stakeholder alignment, and content operations fundamentals.
+- Outcome: Participants craft learning plans and understand how each technical branch contributes to the platform.
+- Key Assets: [Agenda](curriculum/non_technical_starter.md), [Resource kits](resources/), facilitator checklists.
 
-1. Explain the BlogCraftAI product vision, core features, and stakeholder value.
-2. Map content workflows from ideation to publication, including collaboration touchpoints.
-3. Use provided templates to plan blog campaigns, capture requirements, and assess success metrics.
-4. Identify the technical streams (Django, Prompt Engineering, Frontend, Full Stack, Automation) and understand how each contributes to the full platform.
-5. Assemble a personalized learning and resource plan to transition into one of the technical specialization tracks.
+### Django Backend Track (`tracks/django`)
+- Focus: Project scaffolding (`accounts`, `blog`, `api`), PostgreSQL integration, JWT auth, CRUD APIs with permissions.
+- Outcome: Production-ready Django services with 90%+ automated test coverage and deployment pipelines.
+- Key Assets: [Curriculum](tracks/django/curriculum.md), [Resources](tracks/django/resources.md), [Assessments](tracks/django/assessments.md), [Templates](tracks/django/templates/).
 
-## Required Resources (Main Branch)
+### Prompt Engineering Track (`tracks/prompt_engineering`)
+- Focus: Prompt design fundamentals, schema validation, guardrails, and `/api/ai/suggest` implementation with Hugging Face models.
+- Outcome: Safe, observable AI suggestion service that handles retries, forbidden terms, and latency SLAs.
+- Key Assets: [Curriculum](tracks/prompt_engineering/curriculum.md), [Resources](tracks/prompt_engineering/resources.md), [Assessments](tracks/prompt_engineering/assessments.md), [Templates](tracks/prompt_engineering/templates/).
 
-- Video conferencing or classroom setup for facilitator-led sessions.
-- Collaborative tools: digital whiteboard (e.g., Miro), shared documents (e.g., Google Docs/Notion).
-- Printed or digital copies of the agenda, worksheets, and checklist templates located in `resources/`.
-- Access to example blog posts, analytics snapshots, and personas to support hands-on activities.
+### Frontend Experience Track (`tracks/frontend`)
+- Focus: Accessible Django Template frontend with Bootstrap 5 and HTMX, covering authentication, post list/detail, comments, editor with “Suggest SEO”.
+- Outcome: Responsive UI meeting Lighthouse 90+ benchmarks with comprehensive component, accessibility, and e2e tests.
+- Key Assets: [Curriculum](tracks/frontend/curriculum.md), [Resources](tracks/frontend/resources.md), [Assessments](tracks/frontend/assessments.md), [Templates](tracks/frontend/templates/).
 
-## Technical Track Blueprints
+### BlogCraftAI Full-Stack Track (`tracks/blogcraftai`)
+- Focus: Integrating backend, frontend, AI, and ops into the full production platform (Django 5, DRF, PostgreSQL, HTMX, Render.com).
+- Outcome: Deployment-ready BlogCraftAI application with SLO monitoring, runbooks, and governance artifacts.
+- Key Assets: [Curriculum](tracks/blogcraftai/curriculum.md), [Resources](tracks/blogcraftai/resources.md), [Assessments](tracks/blogcraftai/assessments.md), [Templates](tracks/blogcraftai/templates/).
 
-Detailed curricula for the technical branches are prepared in `roadmap/branch_blueprints.md`. These blueprints outline:
+### AI Agents Track (`tracks/ai_agents`)
+- Focus: n8n/Make.com automations connecting BlogCraftAI with external systems, including governance and failure simulations.
+- Outcome: Auditable automation workflows with CI/CD, monitoring, and compliance documentation.
+- Key Assets: [Curriculum](tracks/ai_agents/curriculum.md), [Resources](tracks/ai_agents/resources.md), [Assessments](tracks/ai_agents/assessments.md), [Templates](tracks/ai_agents/templates/).
 
-- Learning objectives and prerequisites.
-- Required tooling and environment setup.
-- Milestone projects and assessment checkpoints.
-- Testing and documentation expectations.
+## Required Resources by Track
 
-## Getting Started (Main Branch)
+| Track | Core Tooling |
+| --- | --- |
+| Non-Technical Starter | Collaboration suite (Miro, Docs), sample personas, analytics snapshots |
+| Django | Python 3.11, Django 5, DRF, PostgreSQL, Redis, pytest, GitHub Actions |
+| Prompt Engineering | Hugging Face models, transformers, guardrails, httpx/tenacity, monitoring stack |
+| Frontend | Django Templates, Bootstrap 5, HTMX, Vite, Jest, Playwright, Lighthouse |
+| BlogCraftAI | Full integrated stack + Render.com, Gunicorn, WhiteNoise, OpenTelemetry |
+| AI Agents | n8n/Make.com, Vault, automation testing harness, workflow repositories |
 
-1. Review the 30-hour agenda in `curriculum/non_technical_starter.md`.
-2. Gather the listed resources and configure the collaboration workspace before the first session.
-3. Follow the facilitator checklist for each module to keep participants engaged and on schedule.
-4. Capture learner feedback using the provided survey template to inform improvements before launching the technical tracks.
+## Getting Started
 
-## Next Steps
+1. Choose the track that aligns with your team’s readiness.
+2. Review the corresponding curriculum and resources within `tracks/`.
+3. Prepare environments and tooling outlined in each track’s resource guide.
+4. Follow assessment guides to ensure quality gates are met before graduation.
+5. Update this README with additional outcomes as new cohorts complete the tracks.
 
-- Once the main branch onboarding is complete, create the technical branches following the blueprints in `roadmap/branch_blueprints.md`.
-- Each branch should introduce runnable code, comprehensive tests, and documentation adhering to the program-wide standards outlined here.
-- Update this README with additional outcomes as branches graduate from planning to implementation.
+## Testing & Quality Expectations
+
+- Each track includes an `assessments.md` file detailing required automated tests, failure simulations, and acceptance criteria.
+- The [tests directory](tests/README.md) describes how to organize branch-specific test suites once code is implemented.
+- Maintain 90%+ coverage across critical services, enforce linting, and document deviations via ADRs.
 
 ## License
 
