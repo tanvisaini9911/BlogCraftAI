@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
+
 import httpx
 import pytest
 
-from ai.services import AiSuggestionError, AiSuggestionService, SeoSuggestion
+from ai.services import AiSuggestionClientError, AiSuggestionError, AiSuggestionService, SeoSuggestion
 
 
 class DummyResponse:
@@ -33,20 +35,33 @@ class DummyClient:
         pass
 
 
+def _wrap_payload(payload: dict) -> dict:
+    return {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {"text": json.dumps(payload)}
+                    ]
+                }
+            }
+        ]
+    }
+
+
 @pytest.mark.django_db
 def test_generate_seo_suggestions_success():
-    response = DummyResponse(
-        {
-            "suggestions": [
-                {
-                    "heading": "Optimise title",
-                    "description": "Add more keywords",
-                    "keywords": ["ai", "blog"],
-                    "risks": ["Verify statistics"],
-                }
-            ]
-        }
-    )
+    response_payload = {
+        "suggestions": [
+            {
+                "heading": "Optimise title",
+                "description": "Add more keywords",
+                "keywords": ["ai", "blog"],
+                "risks": ["Verify statistics"],
+            }
+        ]
+    }
+    response = DummyResponse(_wrap_payload(response_payload))
     service = AiSuggestionService(client=DummyClient(response))
     suggestions = service.generate_seo_suggestions(
         title="AI Post",
@@ -71,7 +86,7 @@ def test_generate_seo_suggestions_timeout():
 
 @pytest.mark.django_db
 def test_generate_seo_suggestions_validation_error():
-    response = DummyResponse({"unexpected": []})
+    response = DummyResponse(_wrap_payload({"unexpected": []}))
     service = AiSuggestionService(client=DummyClient(response))
     with pytest.raises(AiSuggestionError):
         service.generate_seo_suggestions(title="A", summary="B", content="C")
@@ -79,6 +94,6 @@ def test_generate_seo_suggestions_validation_error():
 
 @pytest.mark.django_db
 def test_build_payload_requires_fields():
-    service = AiSuggestionService(client=DummyClient(DummyResponse({"suggestions": []})))
-    with pytest.raises(AiSuggestionError):
+    service = AiSuggestionService(client=DummyClient(DummyResponse(_wrap_payload({"suggestions": []}))))
+    with pytest.raises(AiSuggestionClientError):
         service.build_payload(title="", summary="", content="")

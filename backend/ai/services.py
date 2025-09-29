@@ -15,6 +15,10 @@ class AiSuggestionError(RuntimeError):
     """Raised when the AI suggestion provider returns an unexpected result."""
 
 
+class AiSuggestionClientError(AiSuggestionError):
+    """Raised when the request payload is invalid for AI suggestions."""
+
+
 @dataclass(frozen=True)
 class SeoSuggestion:
     heading: str
@@ -58,51 +62,72 @@ class AiSuggestionService:
         self.timeout = timeout or settings.AI_PROVIDER_TIMEOUT
         self._client = client or httpx.Client(timeout=self.timeout)
 
+    def _extract_candidate_text(self, payload: dict) -> str:
+        candidates = payload.get("candidates")
+        if not candidates:
+            prompt_feedback = payload.get("promptFeedback") or {}
+            block_reason = prompt_feedback.get("blockReason")
+            if block_reason:
+                raise AiSuggestionError(f"AI provider blocked the prompt: {block_reason}")
+            raise AiSuggestionError("AI provider did not return any candidates.")
+        for candidate in candidates:
+            content = candidate.get("content") or {}
+            parts = content.get("parts") or []
+            texts = [part.get("text") for part in parts if isinstance(part, dict) and part.get("text")]
+            combined = "".join(texts).strip()
+            if combined:
+                return combined
+        raise AiSuggestionError("AI provider returned an empty response.")
+
+    def _normalize_model_output(self, text: str) -> str:
+        stripped = text.strip()
+        if stripped.startswith("```") and stripped.endswith("```"):
+            inner = stripped[3:-3].strip()
+            if inner.lower().startswith("json"):
+                inner = inner[4:].lstrip()
+            stripped = inner
+        stripped = stripped.strip()
+        if stripped.startswith("{") and stripped.endswith("}"):
+            return stripped
+        first = stripped.find("{")
+        last = stripped.rfind("}")
+        if first != -1 and last != -1 and first < last:
+            return stripped[first:last + 1].strip()
+        return stripped
+
     def build_payload(self, *, title: str, summary: str, content: str) -> dict:
         title_value = str(title or "").strip()
         summary_value = str(summary or "").strip()
         content_value = str(content or "").strip()
         if not title_value or not summary_value or not content_value:
-            raise AiSuggestionError("Title, summary, and content are required for suggestions.")
+            raise AiSuggestionClientError("Title, summary, and content are required for suggestions.")
 
         prompt = (
             "You are an SEO assistant. Provide actionable suggestions for blog optimisation "
-            "including improved headings, meta descriptions, and keywords."
+            "including improved headings, meta descriptions, and keywords. Return strictly valid JSON "
+            "matching the schema: {\"suggestions\": [{\"heading\": string, \"description\": string, \"keywords\": [string], \"risks\": [string]}]} without extra commentary."
         )
-
-        return {
-            "prompt": prompt,
-            "context": {
+        context_blob = json.dumps(
+            {
                 "title": title_value,
                 "summary": summary_value,
                 "content": content_value,
             },
-            "response_format": {
-                "type": "object",
-                "properties": {
-                    "suggestions": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "heading": {"type": "string"},
-                                "description": {"type": "string"},
-                                "keywords": {
-                                    "type": "array",
-                                    "items": {"type": "string"},
-                                },
-                                "risks": {
-                                    "type": "array",
-                                    "items": {"type": "string"},
-                                },
-                            },
-                            "required": ["heading", "description", "keywords"],
-                            "additionalProperties": False,
-                        },
-                    },
-                },
-                "required": ["suggestions"],
-                "additionalProperties": False,
+            ensure_ascii=False,
+        )
+        message = f"{prompt}\nInput: {context_blob}"
+
+        return {
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [
+                        {"text": message}
+                    ],
+                }
+            ],
+            "generationConfig": {
+                "responseMimeType": "application/json",
             },
         }
 
@@ -124,10 +149,18 @@ class AiSuggestionService:
             raise AiSuggestionError("Unable to contact the AI provider.") from exc
 
         try:
-            payload = response.json()
+            data = response.json()
         except json.JSONDecodeError as exc:
             logger.error("Invalid JSON from AI provider: %s", exc)
             raise AiSuggestionError("AI provider returned malformed data.") from exc
+
+        candidate_text = self._extract_candidate_text(data)
+        normalized_text = self._normalize_model_output(candidate_text)
+        try:
+            payload = json.loads(normalized_text)
+        except json.JSONDecodeError as exc:
+            logger.error("Non-JSON AI provider payload: %s", normalized_text)
+            raise AiSuggestionError("AI provider returned non-JSON suggestions.") from exc
 
         suggestions_raw = payload.get("suggestions")
         if not isinstance(suggestions_raw, (list, tuple)):
