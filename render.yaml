@@ -1,4 +1,4 @@
-databases:
+﻿databases:
   - name: blogcraftai-db
     databaseName: blogcraftai
     user: blogcraftai
@@ -8,11 +8,11 @@ services:
     name: blogcraftai
     env: python
     plan: free
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn blogcraftai.wsgi:application --log-file -"
+    buildCommand: "./backend/build.sh"
+    startCommand: "bash -c \"cd backend && gunicorn blogcraftai.wsgi:application --bind 0.0.0.0:$PORT --log-file -\""
     autoDeploy: true
     healthCheckPath: "/"
-    postDeployCommand: "python manage.py migrate"
+    postDeployCommand: "bash -c \"cd backend && python manage.py migrate --noinput\""
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
@@ -26,5 +26,11 @@ services:
         fromDatabase:
           name: blogcraftai-db
           property: connectionString
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "{{ env \"RENDER_EXTERNAL_HOSTNAME\" }}"
+      - key: SITE_DOMAIN
+        value: "{{ env \"RENDER_EXTERNAL_HOSTNAME\" }}"
+      - key: SITE_URL
+        value: "https://{{ env \"RENDER_EXTERNAL_HOSTNAME\" }}"
       - key: AI_PROVIDER_URL
-        value: ""
+        sync: false
