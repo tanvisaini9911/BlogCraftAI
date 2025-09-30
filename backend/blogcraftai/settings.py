@@ -1,4 +1,4 @@
-0"""Django settings for the BlogCraftAI project."""
+"""Django settings for the BlogCraftAI project."""
 from __future__ import annotations
 
 import os
