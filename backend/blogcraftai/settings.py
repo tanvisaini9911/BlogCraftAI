@@ -8,7 +8,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SITE_NAME = os.getenv("SITE_NAME", "BlogCraftAI")
-SITE_DOMAIN = os.getenv("SITE_DOMAIN", "127.0.0.1:8000")
+SITE_DOMAIN = os.getenv("SITE_DOMAIN", "127.0.0.1:8000", "https://blogcraftai.onrender.com")
 SITE_URL = os.getenv("SITE_URL", f"http://{SITE_DOMAIN}").rstrip('/')
 SITE_DESCRIPTION = os.getenv("SITE_DESCRIPTION", "AI-assisted blogging platform")
 SEO_DEFAULT_IMAGE = os.getenv("SEO_DEFAULT_IMAGE", "")
