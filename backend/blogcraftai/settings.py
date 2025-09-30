@@ -1,4 +1,4 @@
-"""Django settings for the BlogCraftAI project."""
+0"""Django settings for the BlogCraftAI project."""
 from __future__ import annotations
 
 import os
@@ -21,11 +21,7 @@ if debug_flag is not None:
 else:
     DEBUG = DJANGO_ENV not in {"production", "prod"}
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-    if host.strip()
-]
+ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
