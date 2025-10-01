@@ -1,0 +1,44 @@
+﻿{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}Dashboard - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Track drafts, monitor publication progress, and stay aligned with your editorial goals." }}{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>Your editorial dashboard</h1>
+    <p>Monitor drafts, publish new stories, and keep an eye on performance indicators.</p>
+    <div class="stats-grid">
+        <div class="stat">
+            <strong>{{ draft_count }}</strong>
+            <span>Drafts</span>
+        </div>
+        <div class="stat">
+            <strong>{{ published_count }}</strong>
+            <span>Published</span>
+        </div>
+        <div class="stat">
+            <strong>{{ archived_count }}</strong>
+            <span>Archived</span>
+        </div>
+    </div>
+</section>
+
+<section class="card" aria-labelledby="recent-posts">
+    <h2 id="recent-posts">Recently updated</h2>
+    <ul class="dashboard-list">
+        {% for post in posts %}
+            <li>
+                <article>
+                    <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+                    <p class="meta">Status: {{ post.get_status_display }} - Updated {{ post.updated_at|naturaltime }}</p>
+                    <div class="actions">
+                        <a class="button secondary" href="{% url 'blog:post-update' slug=post.slug %}">Edit</a>
+                        <a class="button secondary" href="{% url 'blog:post-delete' slug=post.slug %}">Delete</a>
+                    </div>
+                </article>
+            </li>
+        {% empty %}
+            <li>You have no posts yet. Start by <a href="{% url 'blog:post-create' %}">creating your first article</a>.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

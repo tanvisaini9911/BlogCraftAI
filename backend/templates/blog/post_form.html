@@ -1,0 +1,24 @@
+﻿{% extends "base.html" %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}{% if form.instance.pk %}Edit {{ form.instance.title }}{% else %}Create post{% endif %} - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Draft, optimise, and publish AI-assisted stories from a focused writing workspace." }}{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>{% if form.instance.pk %}Edit post{% else %}Create a new post{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-row">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                    <p class="message message-error">{{ field.errors|join:", " }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button class="button" type="submit">Save post</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+﻿{% extends "base.html" %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}Delete {{ object.title }} - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Confirm deletion of a post and clean up your editorial backlog." }}{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>Delete post</h1>
+    <p>Are you sure you want to delete <strong>{{ object.title }}</strong>? This action cannot be undone.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button class="button" type="submit">Yes, delete</button>
+        <a class="button secondary" href="{{ object.get_absolute_url }}">Cancel</a>
+    </form>
+</section>
+{% endblock %}

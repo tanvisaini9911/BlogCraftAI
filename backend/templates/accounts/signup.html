@@ -1,0 +1,21 @@
+﻿{% extends "base.html" %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}Register - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Create a BlogCraftAI account to plan, publish, and optimise AI-assisted content." }}{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>Create your account</h1>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-row">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}
+                {% if field.errors %}<p class="message message-error">{{ field.errors|join:", " }}</p>{% endif %}
+            </div>
+        {% endfor %}
+        <button class="button" type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a>.</p>
+</section>
+{% endblock %}

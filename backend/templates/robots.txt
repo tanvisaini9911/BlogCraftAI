@@ -1,0 +1,4 @@
+﻿User-agent: *
+Allow: /
+
+Sitemap: {{ site_meta.site_url }}/sitemap.xml

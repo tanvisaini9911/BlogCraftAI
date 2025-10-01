@@ -1,0 +1,11 @@
+﻿{% extends "base.html" %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}Signed out - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"You have successfully signed out. Come back soon to continue growing your content library." }}{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>See you soon!</h1>
+    <p>You have been signed out successfully.</p>
+    <p><a href="{{ redirect_url }}">Return to the homepage</a></p>
+    <a class="button" href="{% url 'accounts:login' %}">Sign in again</a>
+</section>
+{% endblock %}

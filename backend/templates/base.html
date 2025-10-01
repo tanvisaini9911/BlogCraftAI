@@ -1,0 +1,74 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{{ meta_title|default:site_meta.site_name }}{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="canonical" href="{{ canonical_url|default:site_meta.site_url }}" />
+    <meta name="description" content="{% block meta_description %}{{ meta_description|default:site_meta.site_description }}{% endblock %}" />
+    <meta name="robots" content="{{ meta_robots|default:default_meta_robots }}" />
+    <meta property="og:site_name" content="{{ site_meta.site_name }}" />
+    <meta property="og:title" content="{{ meta_title|default:site_meta.site_name }}" />
+    <meta property="og:description" content="{{ meta_description|default:site_meta.site_description }}" />
+    <meta property="og:url" content="{{ canonical_url|default:site_meta.site_url }}" />
+    <meta property="og:type" content="{{ open_graph_type|default:'website' }}" />
+    {% with image_url=meta_image|default:site_meta.default_image %}
+        {% if image_url %}
+            <meta property="og:image" content="{{ image_url }}" />
+            <meta name="twitter:image" content="{{ image_url }}" />
+        {% endif %}
+    {% endwith %}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ meta_title|default:site_meta.site_name }}" />
+    <meta name="twitter:description" content="{{ meta_description|default:site_meta.site_description }}" />
+    {% block extra_head %}{% endblock %}
+    <script type="application/ld+json">{{ site_meta.website_schema|safe }}</script>
+    {% if structured_data %}
+        {% for schema in structured_data %}
+            <script type="application/ld+json">{{ schema|safe }}</script>
+        {% endfor %}
+    {% endif %}
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+        <div class="container">
+            <h1 class="site-title"><a href="{% url 'blog:post-list' %}">BlogCraftAI</a></h1>
+            <nav aria-label="Primary navigation">
+                <ul class="nav-list">
+                    <li><a href="{% url 'blog:post-list' %}">Home</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'blog:dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'accounts:profile-page' %}">Profile</a></li>
+                        <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{% url 'accounts:login' %}">Login</a></li>
+                        <li><a href="{% url 'accounts:signup' %}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" class="container">
+        {% if messages %}
+            <div class="messages" role="status" aria-live="polite">
+                {% for message in messages %}
+                    <div class="message message-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; {% now 'Y' %} {{ site_meta.site_name }}. Built for education and experimentation.</p>
+        </div>
+    </footer>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

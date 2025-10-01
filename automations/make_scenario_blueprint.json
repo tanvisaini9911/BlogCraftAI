@@ -1,0 +1,58 @@
+{
+  "scenario": {
+    "name": "BlogCraftAI Editorial Intake",
+    "triggers": [
+      {
+        "type": "webhook",
+        "label": "New Airtable Brief",
+        "config": {
+          "url": "https://hook.make.com/your-webhook-id",
+          "method": "POST"
+        }
+      }
+    ],
+    "steps": [
+      {
+        "type": "http",
+        "label": "Create Draft Post",
+        "config": {
+          "method": "POST",
+          "url": "https://blogcraftai.local/api/posts/",
+          "headers": {
+            "Authorization": "Bearer {{connection.api_token}}",
+            "Content-Type": "application/json"
+          },
+          "body": "{\n  \"title\": \"{{bundle.title}}\",\n  \"summary\": \"{{bundle.summary}}\",\n  \"content\": \"{{bundle.outline}}\",\n  \"status\": \"draft\"\n}"
+        }
+      },
+      {
+        "type": "iterator",
+        "label": "Enrich with SEO keywords",
+        "config": {
+          "source": "{{bundle.keywords}}"
+        }
+      },
+      {
+        "type": "http",
+        "label": "Request AI Suggestions",
+        "config": {
+          "method": "POST",
+          "url": "https://blogcraftai.local/api/seo-suggestions/",
+          "headers": {
+            "Authorization": "Bearer {{connection.api_token}}",
+            "Content-Type": "application/json"
+          },
+          "body": "{\n  \"title\": \"{{bundle.title}}\",\n  \"summary\": \"{{bundle.summary}}\",\n  \"content\": \"{{bundle.outline}}\"\n}"
+        }
+      },
+      {
+        "type": "notifier",
+        "label": "Send Teams Update",
+        "config": {
+          "channel": "Editorial Updates",
+          "message": "{{bundle.title}} draft created with AI recommendations ready for review."
+        }
+      }
+    ]
+  }
+}

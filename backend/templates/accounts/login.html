@@ -1,0 +1,24 @@
+﻿{% extends "base.html" %}
+{% block title %}{% if meta_title %}{{ meta_title }}{% else %}Sign in - {{ site_meta.site_name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Access your BlogCraftAI workspace and continue crafting AI-optimised stories." }}{% endblock %}
+{% block content %}
+<section class="card">
+    <h1>Sign in</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-row">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.errors %}<p class="message message-error">{{ form.username.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div class="form-row">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            {% if form.password.errors %}<p class="message message-error">{{ form.password.errors|join:", " }}</p>{% endif %}
+        </div>
+        <button class="button" type="submit">Sign in</button>
+    </form>
+    <p>Need an account? <a href="{% url 'accounts:signup' %}">Register</a>.</p>
+</section>
+{% endblock %}
